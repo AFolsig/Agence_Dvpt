@@ -1,3 +1,3 @@
 agence
-aide-publique-au-developpement_clean.csv
-.env
+ingestion/aide-publique-au-developpement_clean.csv
+ingestion/.env
