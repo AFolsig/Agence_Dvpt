@@ -1,3 +1,11 @@
-agence
-ingestion/aide-publique-au-developpement_clean.csv
-ingestion/.env.DS_Store
+agence/
+
+.env
+*/.env
+
+.DS_Store
+
+*.csv
+
+__pycache__/
+*.pyc
