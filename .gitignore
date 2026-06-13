@@ -9,3 +9,5 @@ agence/
 
 __pycache__/
 *.pyc
+
+data/processed/*.csv
