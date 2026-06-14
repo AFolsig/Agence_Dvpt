@@ -1,105 +1,110 @@
+# -*- coding: utf-8 -*-
+import os
+import sys
+import pandas as pd
+import joblib
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-# Imports dynamiques des scripts
+# Importation unique du script d'entra√Ænement
 try:
-    from training.training import run_training_pipeline
-    from predict.predict import run_predict_pipeline
+    from models.train_regression import train_model as run_training_pipeline
 except ImportError as e:
-    raise ImportError(
-        f"Erreur d'importation. Assurez-vous que vos dossiers 'training' et 'predict' "
-        f"contiennent bien un fichier '__init__.py'. DÇtail : {e}"
-    )
+    raise ImportError(f"Impossible d'importer le script d'entra√Ænement. D√©tail : {e}")
 
-# Initialisation FastAPI
 app = FastAPI(
-    title="API MLOps - Aide Publique au DÇveloppement (APD)",
-    description="API d'infÇrence et d'entraånement pour la prÇdiction des engagements financiers.",
-    version="1.0.0"
+    title="API MLOps APD",
+    description="API de pr√©diction des engagements APD (Version Autonome)",
+    version="1.0"
 )
 
 # -----------------------------
-#   SCHEMA DES VARIABLES D'ENTRêE
+# SCHEMA DES VARIABLES D'ENTREE
 # -----------------------------
 class PredictionInput(BaseModel):
+    Agence: str = Field(..., example="Agence de Dakar")
+    Nature_de_l_activite: str = Field(..., alias="Nature de l'activite", example="Pr√™t projet")
+    Pays_beneficiaire: str = Field(..., alias="Pays beneficiaire", example="S√©n√©gal")
+    Secteur: str = Field(..., example="√âducation, formation professionnelle et emploi")
+    Type_de_financement: str = Field(..., alias="Type de financement", example="Souverain")
+    Canal_de_transfert: str = Field(..., alias="Canal de transfert", example="ONG")
+    Genre: str = Field(..., example="Non cibl√©")
+    nb_ODD: int = Field(..., example=3)
 
-    # Variables catÇgorielles
-    pays: str = Field(..., example="SÇnÇgal")
-    agence: str = Field(..., example="Agence Dakar")
-    secteur: str = Field(..., example="êducation")
-    canal_transfert: str = Field(..., example="Canal bilatÇral")
-    type_flux: str = Field(..., example="Pràt")
-    type_financement: str = Field(..., example="Souverain")
-    modalite_cooperation: str = Field(..., example="Projet")
-    objet: str = Field(..., example="Construction d'infrastructures")
-    priorite_cicid: str = Field(..., example="Climat")
-    region: str = Field(..., example="Afrique subsaharienne")
-    sous_region: str = Field(..., example="Afrique de l'Ouest")
-
-    # Marqueurs
-    marqueur_climat: int = Field(..., example=1)
-    marqueur_genre: int = Field(..., example=0)
-    marqueur_env: int = Field(..., example=0)
-
-    # Variables numÇriques
-    nb_odd: int = Field(..., example=2)
-    principal_debourse_k_eur: float = Field(..., example=500)
-    principal_restant_k_eur: float = Field(..., example=1500)
-    interets_k_eur: float = Field(..., example=20)
-    dividendes_k_eur: float = Field(..., example=0)
-    taille_projet: float = Field(..., example=2500)
-    duree_mois: int = Field(..., example=24)
-
+    class Config:
+        populate_by_name = True
 
 # -----------------------------
-#   ENDPOINTS
+# ROUTES DE L'API
 # -----------------------------
-
 @app.get("/")
-def read_root():
-    return {
-        "status": "online",
-        "message": "API APD MLOps opÇrationnelle. AccÇdez Ö /docs pour Swagger."
-    }
+def home():
+    return {"message": "API APD op√©rationnelle"}
 
-
-@app.post("/training", tags=["Pipeline d'Entraånement"])
-def trigger_training():
+@app.post("/train")
+def train():
     try:
         metrics = run_training_pipeline()
         return {
-            "status": "success",
-            "message": "Pipeline d'entraånement exÇcutÇ avec succäs.",
+            "message": "Mod√®le entra√Æn√© avec succ√®s",
             "metrics": metrics
         }
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Erreur lors de l'entraånement : {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=str(e))
 
-
-@app.post("/predict", tags=["Pipeline d'InfÇrence"])
-def trigger_prediction(payload: PredictionInput):
+@app.post("/predict")
+def predict(data: PredictionInput):
     try:
-        input_data = payload.model_dump()
-        prediction_k_eur = run_predict_pipeline(input_data)
+        # 1. V√©rification et Chargement dynamique du mod√®le pkl
+        model_path = "models/modele_regression_rf.pkl"
+        if not os.path.exists(model_path):
+            raise HTTPException(
+                status_code=400, 
+                detail="Le fichier du mod√®le (.pkl) est introuvable. Veuillez d'abord ex√©cuter la route /train."
+            )
+        
+        model = joblib.load(model_path)
+        FEATURES = model.feature_names_in_
+        preprocessor = model.named_steps["preprocessing"]
 
+        numeric_cols = []
+        categorical_cols = []
+
+        # Extraction des types de colonnes depuis le pr√©processeur du mod√®le
+        for name, transformer, cols in preprocessor.transformers_:
+            if name in ["num", "numeric", "numerical"]:
+                numeric_cols = list(cols)
+            elif name in ["cat", "categorical"]:
+                categorical_cols = list(cols)
+
+        # 2. R√©cup√©ration et conversion de la payload Pydantic
+        input_data = data.model_dump(by_alias=True)
+        df_input = pd.DataFrame([input_data])
+
+        # 3. Application de votre logique de nettoyage originale
+        for col in FEATURES:
+            if col not in df_input.columns:
+                if col in numeric_cols:
+                    df_input[col] = 0
+                else:
+                    df_input[col] = "Non renseign√©"
+
+        for col in numeric_cols:
+            if col in df_input.columns:
+                df_input[col] = pd.to_numeric(df_input[col], errors="coerce").fillna(0)
+
+        for col in categorical_cols:
+            if col in df_input.columns:
+                df_input[col] = df_input[col].fillna("Non renseign√©").astype(str)
+
+        # Alignement strict des colonnes avant la pr√©diction
+        df_input = df_input[FEATURES]
+
+        # 4. Pr√©diction finale
+        prediction = model.predict(df_input)[0]
+        
         return {
-            "status": "success",
-            "input_data": input_data,
-            "predicted_engagement_k_eur": round(prediction_k_eur, 2)
+            "prediction_engagement_k_eur": round(float(prediction), 2)
         }
-
-    except FileNotFoundError:
-        raise HTTPException(
-            status_code=404,
-            detail="Modäle introuvable. Lancez d'abord /training."
-        )
-
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Erreur lors de l'infÇrence : {str(e)}"
-        )
-
+        raise HTTPException(status_code=500, detail=str(e))
