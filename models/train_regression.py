@@ -1,3 +1,5 @@
+import mlflow
+import mlflow.sklearn
 import os
 import joblib
 import pandas as pd
@@ -51,14 +53,28 @@ def train_model():
        X, y, test_size=0.2, random_state=42
    )
 
+   with mlflow.start_run():
+
    model.fit(X_train, y_train)
 
    y_pred = model.predict(X_test)
 
+   r2 = r2_score(y_test, y_pred)
+   mae = mean_absolute_error(y_test, y_pred)
+
    metrics = {
-       "r2": round(r2_score(y_test, y_pred), 3),
-       "mae": round(mean_absolute_error(y_test, y_pred), 3)
+       "r2": round(r2, 3),
+       "mae": round(mae, 3)
    }
+
+   mlflow.log_param("n_estimators", 100)
+   mlflow.log_metric("r2", r2)
+   mlflow.log_metric("mae", mae)
+
+   mlflow.sklearn.log_model(
+       sk_model=model,
+       artifact_path="random_forest_model"
+   )
 
    os.makedirs("models", exist_ok=True)
    joblib.dump(model, MODEL_PATH)
