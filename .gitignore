@@ -13,3 +13,6 @@ __pycache__/
 data/processed/*.csv
 
 models/*.pkl
+
+mlflow.db
+mlruns/
