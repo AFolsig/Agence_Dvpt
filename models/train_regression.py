@@ -53,6 +53,7 @@ def train_model():
        X, y, test_size=0.2, random_state=42
    )
 
+   mlflow.set_experiment("APD_regression")
    with mlflow.start_run():
 
        model.fit(X_train, y_train)
