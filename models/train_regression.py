@@ -72,10 +72,10 @@ def train_model():
        mlflow.log_metric("r2", r2)
        mlflow.log_metric("mae", mae)
 
-       mlflow.log_artifact(MODEL_PATH)
+       os.makedirs("models", exist_ok=True)
+       joblib.dump(model, MODEL_PATH)
 
-   os.makedirs("models", exist_ok=True)
-   joblib.dump(model, MODEL_PATH)
+       mlflow.log_artifact(MODEL_PATH)
 
    return metrics
 
