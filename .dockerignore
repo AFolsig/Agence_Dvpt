@@ -1,0 +1,6 @@
+agence/
+__pycache__/
+.git/
+mlruns/
+logs/
+*.pyc
