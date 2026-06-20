@@ -16,3 +16,5 @@ models/*.pkl
 
 mlflow.db
 mlruns/
+
+logs/

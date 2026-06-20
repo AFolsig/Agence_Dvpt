@@ -55,7 +55,21 @@ def train_model():
 
    mlflow.set_experiment("APD_regression")
    with mlflow.start_run():
+       import subprocess
 
+       try:
+           git_commit = subprocess.check_output(
+               ["git", "rev-parse", "--short", "HEAD"]
+           ).decode("utf-8").strip()
+
+           mlflow.set_tag("git_commit", git_commit)
+           mlflow.set_tag("dataset_version", "apd_ml_ready_2026_06_19")
+           mlflow.set_tag("dataset_path", DATA_PATH)
+
+       except:
+           pass
+
+       
        model.fit(X_train, y_train)
 
        y_pred = model.predict(X_test)
