@@ -19,7 +19,7 @@ class PredictionInput(BaseModel):
    Type_de_financement: str
    Canal_de_transfert: str
    Genre: float
-   nb_ODD: float
+   ODD: float
 
 @app.get("/")
 def home():
@@ -42,13 +42,13 @@ def collect():
 def predict(data: PredictionInput):
     input_data = {
         "Agence": data.Agence,
-        "Nature de l'activite": data.Nature_de_l_activite,
-        "Pays beneficiaire": data.Pays_beneficiaire,
+        "Nature_de_l'activite": data.Nature_de_l_activite,
+        "Pays_beneficiaire": data.Pays_beneficiaire,
         "Secteur": data.Secteur,
-        "Type de financement": data.Type_de_financement,
-        "Canal de transfert": data.Canal_de_transfert,
+        "Type_de_financement": data.Type_de_financement,
+        "Canal_de_transfert": data.Canal_de_transfert,
         "Genre": data.Genre,
-        "nb_ODD": data.nb_ODD
+        "ODD": data.ODD
     }
 
     prediction = predict_regression(input_data)
