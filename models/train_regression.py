@@ -1,5 +1,6 @@
 import mlflow
 import mlflow.sklearn
+from mlflow.tracking import MlflowClient
 import os
 import joblib
 import pandas as pd
@@ -85,6 +86,37 @@ def train_model():
        mlflow.log_param("n_estimators", 100)
        mlflow.log_metric("r2", r2)
        mlflow.log_metric("mae", mae)
+
+       model_name = "apd_regression_model"
+
+       mlflow.sklearn.log_model(
+           sk_model=model,
+           name="model",
+           registered_model_name=model_name,
+           skops_trusted_types=["numpy.dtype"]
+       )
+
+       client = MlflowClient()
+
+       latest_version = client.get_latest_versions(model_name)[-1].version
+
+       best_mae = None
+       try:
+           champion = client.get_model_version_by_alias(model_name, "champion")
+           champion_run = client.get_run(champion.run_id)
+           best_mae = champion_run.data.metrics.get("mae")
+       except Exception:
+           pass
+
+       if best_mae is None or mae < best_mae:
+           client.set_registered_model_alias(
+               name=model_name,
+               alias="champion",
+               version=latest_version
+           )
+           mlflow.set_tag("promotion", "champion")
+       else:
+           mlflow.set_tag("promotion", "not_promoted")
 
        os.makedirs("models", exist_ok=True)
        joblib.dump(model, MODEL_PATH)

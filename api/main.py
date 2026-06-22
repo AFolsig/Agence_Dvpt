@@ -35,7 +35,7 @@ def train():
 def predict(data: PredictionInput):
    input_data = {
        "Agence": data.Agence,
-       "Nature de l'activité": data.Nature_de_l_activite,
+       "Nature de l'activite": data.Nature_de_l_activite,
        "Pays beneficiaire": data.Pays_beneficiaire,
        "Secteur": data.Secteur,
        "Type de financement": data.Type_de_financement,
