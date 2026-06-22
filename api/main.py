@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from models.train_regression import train_model
 from models.predict import predict_regression
+from etl.collect_batch import collect_next_batch
+
 
 app = FastAPI(
    title="API MLOps APD",
@@ -21,31 +23,36 @@ class PredictionInput(BaseModel):
 
 @app.get("/")
 def home():
-   return {"message": "API APD opérationnelle"}
+    return {"message": "API APD opérationnelle"}
 
 @app.post("/train")
 def train():
-   metrics = train_model()
-   return {
-       "message": "Modèle entraîné avec succès",
-       "metrics": metrics
-   }
+    metrics = train_model()
+    return {
+        "message": "Modèle entraîné avec succès",
+        "metrics": metrics
+    }
+
+@app.post("/collect")
+def collect():
+    result = collect_next_batch()
+    return result
 
 @app.post("/predict")
 def predict(data: PredictionInput):
-   input_data = {
-       "Agence": data.Agence,
-       "Nature de l'activite": data.Nature_de_l_activite,
-       "Pays beneficiaire": data.Pays_beneficiaire,
-       "Secteur": data.Secteur,
-       "Type de financement": data.Type_de_financement,
-       "Canal de transfert": data.Canal_de_transfert,
-       "Genre": data.Genre,
-       "nb_ODD": data.nb_ODD
-   }
+    input_data = {
+        "Agence": data.Agence,
+        "Nature de l'activite": data.Nature_de_l_activite,
+        "Pays beneficiaire": data.Pays_beneficiaire,
+        "Secteur": data.Secteur,
+        "Type de financement": data.Type_de_financement,
+        "Canal de transfert": data.Canal_de_transfert,
+        "Genre": data.Genre,
+        "nb_ODD": data.nb_ODD
+    }
 
-   prediction = predict_regression(input_data)
+    prediction = predict_regression(input_data)
 
-   return {
-       "prediction_engagement_k_eur": round(prediction, 2)
-   }
+    return {
+        "prediction_engagement_k_eur": round(prediction, 2)
+    }
