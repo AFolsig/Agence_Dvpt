@@ -1,9 +1,8 @@
 import pandas as pd
-import mlflow.pyfunc
+import joblib
 
-MODEL_URI = "models:/apd_regression_model@champion"
-
-model = mlflow.pyfunc.load_model(MODEL_URI)
+MODEL_PATH = "models/modele_regression_rf.pkl"
+model = joblib.load(MODEL_PATH)
 
 FEATURES = [
    "Agence",
