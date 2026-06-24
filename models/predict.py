@@ -7,24 +7,24 @@ model = mlflow.pyfunc.load_model(MODEL_URI)
 
 FEATURES = [
    "Agence",
-   "Nature de l'activite",
-   "Pays beneficiaire",
+   "Nature_de_l'activite",
+   "Pays_beneficiaire",
    "Secteur",
-   "Type de financement",
-   "Canal de transfert",
+   "Type_de_financement",
+   "Canal_de_transfert",
    "Genre",
-   "nb_ODD"
+   "ODD"
 ]
 
-numeric_cols = ["Genre", "nb_ODD"]
+numeric_cols = ["Genre", "ODD"]
 
 categorical_cols = [
    "Agence",
-   "Nature de l'activite",
-   "Pays beneficiaire",
+   "Nature_de_l'activite",
+   "Pays_beneficiaire",
    "Secteur",
-   "Type de financement",
-   "Canal de transfert",
+   "Type_de_financement",
+   "Canal_de_transfert",
 ]
 
 

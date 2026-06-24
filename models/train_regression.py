@@ -124,7 +124,7 @@ def train_model():
        except Exception:
            pass
 
-       if best_mae is None or mae < best_mae:
+       if best_mae is None or mae <= best_mae:
            client.set_registered_model_alias(
                name=model_name,
                alias="champion",

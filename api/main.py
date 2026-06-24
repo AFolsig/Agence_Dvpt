@@ -56,3 +56,14 @@ def predict(data: PredictionInput):
     return {
         "prediction_engagement_k_eur": round(prediction, 2)
     }
+
+@app.post("/pipeline")
+def pipeline():
+    collect_result = collect_next_batch()
+    metrics = train_model()
+
+    return {
+        "message": "Pipeline exécuté avec succès",
+        "collect": collect_result,
+        "metrics": metrics
+    }
