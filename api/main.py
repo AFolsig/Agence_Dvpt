@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+import os
+from fastapi import FastAPI, Header, HTTPException, Depends
 from pydantic import BaseModel
 from models.train_regression import train_model
 from models.predict import predict_regression
@@ -10,6 +11,12 @@ app = FastAPI(
    description="API de prédiction des engagements APD",
    version="1.0"
 )
+
+API_KEY = os.getenv("API_KEY", "apd-secret-key")
+
+def verify_api_key(x_api_key: str = Header(None)):
+   if x_api_key != API_KEY:
+       raise HTTPException(status_code=401, detail="Clé API invalide")
 
 class PredictionInput(BaseModel):
    Agence: str
@@ -25,7 +32,7 @@ class PredictionInput(BaseModel):
 def home():
     return {"message": "API APD opérationnelle"}
 
-@app.post("/train")
+@app.post("/train", dependencies=[Depends(verify_api_key)])
 def train():
     metrics = train_model()
     return {
@@ -33,12 +40,12 @@ def train():
         "metrics": metrics
     }
 
-@app.post("/collect")
+@app.post("/collect", dependencies=[Depends(verify_api_key)])
 def collect():
     result = collect_next_batch()
     return result
 
-@app.post("/predict")
+@app.post("/predict", dependencies=[Depends(verify_api_key)])
 def predict(data: PredictionInput):
     input_data = {
         "Agence": data.Agence,
@@ -57,7 +64,7 @@ def predict(data: PredictionInput):
         "prediction_engagement_k_eur": round(prediction, 2)
     }
 
-@app.post("/pipeline")
+@app.post("/pipeline", dependencies=[Depends(verify_api_key)])
 def pipeline():
     collect_result = collect_next_batch()
     metrics = train_model()
