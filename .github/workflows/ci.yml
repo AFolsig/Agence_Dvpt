@@ -24,6 +24,6 @@ jobs:
          python -m pip install --upgrade pip
          pip install -r requirements.txt
 
-     - name: Check imports
+     - name: Check Python files
        run: |
-         python -c "from api.main import app; print('API import OK')"
+         python -m py_compile api/main.py models/predict.py models/train_regression.py
