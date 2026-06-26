@@ -13,6 +13,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import r2_score, mean_absolute_error
+from datetime import datetime
 
 DATA_PATH = "data/processed/apd_ml_ready.csv"
 MODEL_PATH = "models/modele_regression_rf.pkl"
@@ -78,10 +79,19 @@ def train_model():
            git_commit = subprocess.check_output(
                ["git", "rev-parse", "--short", "HEAD"]
            ).decode("utf-8").strip()
+           git_message = subprocess.check_output(
+               ["git", "log", "-1", "--pretty=%s"]
+           ).decode("utf-8").strip()
 
            mlflow.set_tag("git_commit", git_commit)
-           mlflow.set_tag("dataset_version", "apd_ml_ready_2026_06_19")
+           mlflow.set_tag("git_message", git_message)
+           dataset_version = datetime.fromtimestamp(
+               os.path.getmtime(DATA_PATH)
+           ).strftime("%Y-%m-%d_%H-%M-%S")
+
+           mlflow.set_tag("dataset_version", dataset_version)
            mlflow.set_tag("dataset_path", DATA_PATH)
+           mlflow.log_artifact(DATA_PATH, artifact_path="dataset")
 
        except:
            pass

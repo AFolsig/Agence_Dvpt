@@ -6,4 +6,4 @@ source agence/bin/activate
 
 export $(grep -v '^#' .env | xargs)
 
-python models/train_regression.py >> logs/train_cron.log 2>&1
+python -m models.train_regression >> logs/train_cron.log 2>&1
