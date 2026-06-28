@@ -1,5 +1,6 @@
 import pandas as pd
 from sqlalchemy import create_engine
+from dotenv import load_dotenv
 import mlflow
 import mlflow.sklearn
 from mlflow.tracking import MlflowClient
@@ -19,26 +20,29 @@ DATA_PATH = "data/processed/apd_ml_ready.csv"
 MODEL_PATH = "models/modele_regression_rf.pkl"
 
 def train_model():
-   engine = create_engine("sqlite:///apd.db")
-   df = pd.read_sql("SELECT * FROM apd_data", engine)
+   load_dotenv("ingestion/.env")
+   DATABASE_URL = os.getenv("DATABASE_URL")
 
-   target = "Engagements_(K_EUR)"
+   engine = create_engine(DATABASE_URL)
+   df = pd.read_sql('SELECT * FROM "donnees"', engine)
+
+   target = "Engagements (K EUR)"
    df = df.dropna(subset=[target])
    df[target] = pd.to_numeric(df[target], errors="coerce")
    df = df.dropna(subset=[target])
    y = df[target]
    categorical_features = [
        "Agence",
-       "Nature_de_l'activite",
-       "Pays_beneficiaire",
+       "Nature de l'activite",
+       "Pays beneficiaire",
        "Secteur",
-       "Type_de_financement",
-       "Canal_de_transfert"
+       "Type de financement",
+       "Canal de transfert"
    ]
 
    numeric_features = [
        "Genre",
-       "ODD"
+       "nb_ODD"
    ]
    features = categorical_features + numeric_features
 

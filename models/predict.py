@@ -1,8 +1,12 @@
+import mlflow.pyfunc
 import pandas as pd
-import joblib
 
-MODEL_PATH = "models/modele_regression_rf.pkl"
-model = joblib.load(MODEL_PATH)
+MODEL_NAME = "apd_regression_model"
+MODEL_ALIAS = "champion"
+
+model_uri = f"models:/{MODEL_NAME}@{MODEL_ALIAS}"
+
+model = mlflow.pyfunc.load_model(model_uri)
 
 FEATURES = [
    "Agence",
@@ -46,5 +50,6 @@ def predict_regression(input_data):
    df_input = df_input[FEATURES]
 
    print("Colonnes envoyées :", df_input.columns.tolist())
+   df_input = df_input[FEATURES]
    prediction = model.predict(df_input)[0]
    return float(prediction)
