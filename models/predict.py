@@ -1,12 +1,25 @@
+import mlflow
 import mlflow.pyfunc
 import pandas as pd
 
 MODEL_NAME = "apd_regression_model"
 MODEL_ALIAS = "champion"
 
-model_uri = f"models:/{MODEL_NAME}@{MODEL_ALIAS}"
+_model = None
+_model_uri_loaded = None
 
-model = mlflow.pyfunc.load_model(model_uri)
+def get_model():
+   global _model, _model_uri_loaded
+
+   model_uri = f"models:/{MODEL_NAME}@{MODEL_ALIAS}"
+
+   if _model is None or _model_uri_loaded != model_uri:
+       print(f"Chargement du modèle MLflow : {model_uri}")
+       _model = mlflow.pyfunc.load_model(model_uri)
+       _model_uri_loaded = model_uri
+
+   return _model
+
 
 FEATURES = [
    "Agence",
@@ -32,24 +45,40 @@ categorical_cols = [
 
 
 def predict_regression(input_data):
-   df_input = pd.DataFrame([input_data])
+   model = get_model()
 
-   for col in FEATURES:
-       if col not in df_input.columns:
-           if col in numeric_cols:
-               df_input[col] = 0
-           else:
-               df_input[col] = "Non renseigné"
+   df_input = pd.DataFrame([{
+       "Agence": input_data.get("Agence", "Inconnu"),
+       "Nature de l'activite": input_data.get("Nature_de_l_activite", "Inconnu"),
+       "Pays beneficiaire": input_data.get("Pays_beneficiaire", "Inconnu"),
+       "Secteur": input_data.get("Secteur", "Inconnu"),
+       "Type de financement": input_data.get("Type_de_financement", "Inconnu"),
+       "Canal de transfert": input_data.get("Canal_de_transfert", "Inconnu"),
+       "Genre": input_data.get("Genre", 0),
+       "nb_ODD": input_data.get("ODD", 0),
+   }])
 
-   for col in numeric_cols:
-       df_input[col] = pd.to_numeric(df_input[col], errors="coerce").fillna(0)
+   categorical_cols = [
+       "Agence",
+       "Nature de l'activite",
+       "Pays beneficiaire",
+       "Secteur",
+       "Type de financement",
+       "Canal de transfert",
+   ]
+
+   numeric_cols = ["Genre", "nb_ODD"]
 
    for col in categorical_cols:
-       df_input[col] = df_input[col].fillna("Non renseigné").astype(str)
+       df_input[col] = df_input[col].fillna("Inconnu").astype(str)
 
-   df_input = df_input[FEATURES]
+   for col in numeric_cols:
+       df_input[col] = pd.to_numeric(df_input[col], errors="coerce").fillna(0).astype(float)
 
    print("Colonnes envoyées :", df_input.columns.tolist())
-   df_input = df_input[FEATURES]
+   print("Types envoyés :")
+   print(df_input.dtypes)
+
    prediction = model.predict(df_input)[0]
-   return float(prediction)
+
+   return round(float(prediction), 2)

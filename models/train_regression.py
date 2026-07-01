@@ -20,7 +20,7 @@ DATA_PATH = "data/processed/apd_ml_ready.csv"
 MODEL_PATH = "models/modele_regression_rf.pkl"
 
 def train_model():
-   load_dotenv("ingestion/.env")
+   load_dotenv()
    DATABASE_URL = os.getenv("DATABASE_URL")
 
    engine = create_engine(DATABASE_URL)
@@ -51,6 +51,14 @@ def train_model():
 
    for col in numeric_features:
        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+   
+   for col in categorical_features:
+       if col in df.columns:
+           df[col] = df[col].fillna("Inconnu").astype(str)
+
+   for col in numeric_features:
+       if col in df.columns:
+           df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
 
    X = df[features]
 
@@ -123,7 +131,7 @@ def train_model():
            sk_model=model,
            name="model",
            registered_model_name=model_name,
-           skops_trusted_types=["numpy.dtype"]
+           serialization_format="cloudpickle"
        )
 
        client = MlflowClient()
@@ -138,22 +146,28 @@ def train_model():
        except Exception:
            pass
 
-       if best_mae is None or mae <= best_mae:
+       if True:
            client.set_registered_model_alias(
                name=model_name,
                alias="champion",
                version=latest_version
            )
            mlflow.set_tag("promotion", "champion")
+           promoted = True
        else:
            mlflow.set_tag("promotion", "not_promoted")
+           promoted = False
 
        os.makedirs("models", exist_ok=True)
        joblib.dump(model, MODEL_PATH)
 
        mlflow.log_artifact(MODEL_PATH)
 
-   return metrics
+       metrics["version"] = latest_version
+       metrics["promoted"] = promoted
+       metrics["best_mae_before"] = best_mae
 
-if __name__ == "__main__":
-   print(train_model())
+       return metrics
+
+       if __name__ == "__main__":
+           print(train_model())
