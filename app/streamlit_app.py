@@ -24,6 +24,7 @@ page = st.sidebar.radio(
        "Données & Supabase",
        "Prédiction",
        "Historique des prédictions",
+       "Améliorations futures",
    ],
 )
 
@@ -56,7 +57,7 @@ if page == "Accueil":
    with col2:
        st.metric(
            label="🧹 Données nettoyées",
-           value="79 025",
+           value="72 835",
            delta="35 variables"
        )
 
@@ -190,7 +191,7 @@ if page == "Accueil":
        st.markdown("""
        **📅 Version**
 
-       Juin 2026  
+       Juillet 2026  
        Projet fil rouge MLOps
        """)
 
@@ -209,7 +210,7 @@ jusqu'à la prédiction finale.
    st.subheader("📊 Chiffres clés du projet")
 
    m1, m2, m3 = st.columns(3)
-   m1.metric("Lignes", "79 025")
+   m1.metric("Lignes", "72 835")
    m2.metric("Colonnes", "35")
    m3.metric("Base", "PostgreSQL")
 
@@ -272,7 +273,7 @@ jusqu'à la prédiction finale.
        A["📂 Données APD<br/>106 519 lignes<br/>103 colonnes"]
        B["📦 Collecte automatique<br/>Batch APD"]
        C["🗄️ Supabase<br/>PostgreSQL"]
-       D["⚙️ Prétraitement<br/>Nettoyage + encodage<br/>79 025 lignes / 35 variables"]
+       D["⚙️ Prétraitement<br/>Nettoyage + encodage<br/>72 835 lignes / 35 variables"]
        E["🤖 Entraînement<br/>Random Forest Regressor"]
        F["📈 MLflow<br/>Tracking des runs<br/>métriques + artefacts"]
        G["🏆 Model Registry<br/>Alias Champion"]
@@ -339,17 +340,29 @@ jusqu'à la prédiction finale.
 
    st.table({
        "Endpoint": [
+           "/",
+           "/health",
            "/collect",
            "/train",
            "/predict",
-           "/docs"
+           "/pipeline",
+           "/metrics",
+           "/data-stats",
+           "/prediction-history",
+           "/docs",
        ],
        "Description": [
+           "Page d'accueil de l'API",
+           "Vérifie que l'API est disponible",
            "Collecte automatique des données APD",
            "Entraîne le modèle Random Forest",
            "Prédit les engagements (K EUR)",
-           "Documentation interactive (Swagger UI)"
-       ]
+           "Exécute un scénario complet de prédiction",
+           "Récupère les métriques du modèle Champion",
+           "Récupère les statistiques des données Supabase",
+           "Affiche l'historique des prédictions enregistrées",
+           "Documentation interactive Swagger UI",
+       ],
    })
 
    st.divider()
@@ -445,15 +458,13 @@ jusqu'à la prédiction finale.
 
        st.info("""
    ### 🌐 FastAPI
-   Endpoints :
-
-   • /collect 
-
-   • /train
-
-   • /predict
-
-   Authentification par API key
+   - API sécurisée (x-api-key)
+   - Collecte des données
+   - Entraînement du modèle
+   - Prédiction
+   - Métriques et statistiques
+   - Historique des prédictions
+   - Documentation Swagger (`/docs`)
    """)
 
    st.markdown("---")
@@ -649,23 +660,23 @@ elif page == "Données & Supabase":
 
        - Nettoyage des données
        - Traitement des valeurs manquantes
-       - Enrichissement des données (nb_ODD)
-       - Données préparées pour l'entraînement du modèle
+       - Sélection des variables utiles
+       - Encodage des variables catégorielles
        """)
 
    with col2:
        st.markdown("""
        ### Données prêtes pour le ML
 
-       - Dataset exploitable
-       - Variables transformées et enrichies
+       - Dataset de 72 835 lignes
+       - 35 variables conservées
        - Cible définie : `Engagements (K EUR)`
        - Compatible avec le pipeline Scikit-Learn
        """)
 
    st.success("""
-   ✅ Les données APD sont correctement préparées et stockées dans Supabase
-   avant leur utilisation par le modèle Random Forest.
+   ✅ Les données APD ont été nettoyées, transformées et préparées
+   avant leur utilisation par le pipeline d'entraînement Random Forest.
    """)
 
 
@@ -1079,4 +1090,96 @@ elif page == "Présentation":
    - ⚙️ une **API FastAPI** pour les prédictions ;
    - 🗄️ une base **PostgreSQL (Supabase)** ;
    - 📊 **MLflow** pour le suivi des expérimentations.
+   """)
+
+elif page == "Améliorations futures":
+
+   st.title("🚀 Améliorations futures du projet")
+
+   st.markdown("""
+   Cette page présente les évolutions qui auraient pu être ajoutées avec plus de temps
+   afin de rapprocher le projet d'une architecture MLOps professionnelle complète.
+   """)
+
+   st.divider()
+
+   st.header("⏱️ Orchestration avec Airflow")
+
+   st.markdown("""
+   **Airflow** permettrait d'automatiser toute la chaîne de traitement :
+
+   - collecte automatique des données APD ;
+   - chargement dans Supabase ;
+   - préparation des données ;
+   - entraînement du modèle ;
+   - enregistrement des métriques dans MLflow ;
+   - promotion automatique du meilleur modèle.
+   """)
+
+   st.success("Objectif : remplacer les lancements manuels par un pipeline planifié et reproductible.")
+
+   st.divider()
+
+   st.header("📊 Monitoring avec Prometheus et Grafana")
+
+   st.markdown("""
+   **Prometheus** et **Grafana** permettraient de suivre l'API et le modèle en production :
+
+   - temps de réponse de l'API ;
+   - nombre de prédictions réalisées ;
+   - erreurs HTTP ;
+   - évolution des performances du modèle ;
+   - dérive potentielle des données.
+   """)
+
+   st.success("Objectif : surveiller la santé du système et détecter rapidement les anomalies.")
+
+   st.divider()
+
+   st.header("☸️ Déploiement avec Kubernetes")
+
+   st.markdown("""
+   **Kubernetes** permettrait de rendre l'application plus robuste et scalable :
+
+   - déploiement de FastAPI dans un conteneur ;
+   - déploiement de Streamlit dans un autre conteneur ;
+   - gestion automatique des redémarrages ;
+   - montée en charge si le trafic augmente ;
+   - meilleure séparation entre API, interface et base de données.
+   """)
+
+   st.success("Objectif : rendre le projet plus proche d'un environnement de production réel.")
+
+   st.divider()
+
+   st.header("🚀 Déploiement et industrialisation")
+
+   st.markdown("""
+   Améliorations envisageables en environnement de production :
+
+   - gestion des secrets avec un coffre sécurisé (Vault, Secrets Manager) ;
+   - authentification OAuth2/JWT à la place d'une simple clé API ;
+   - déploiement continu (CD) après validation de la CI GitHub Actions ;
+   - publication automatique des images Docker ;
+   - validation automatique des données entrantes ;
+   - alertes automatiques en cas d'échec du pipeline.
+   """)
+
+   st.divider()
+
+   st.header("🎯 Conclusion")
+
+   st.info("""
+   Le projet met déjà en oeuvre les principales briques d'un pipeline MLOps moderne :
+
+   - collecte automatisée des données ;
+   - stockage dans Supabase PostgreSQL ;
+   - prétraitement et entraînement du modèle ;
+   - suivi des expériences avec MLflow ;
+   - Model Registry avec alias Champion ;
+   - API FastAPI sécurisée ;
+   - interface Streamlit ;
+   - intégration continue (CI) avec GitHub Actions.
+
+   Les améliorations proposées (Airflow, Prometheus, Grafana, Kubernetes et déploiement continu) constituent les prochaines étapes pour faire évoluer ce prototype vers une plateforme MLOps pleinement industrialisée.
    """)
