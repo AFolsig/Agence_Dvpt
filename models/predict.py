@@ -11,7 +11,7 @@ _model_uri_loaded = None
 def get_model():
    global _model, _model_uri_loaded
 
-   model_uri = f"models:/{MODEL_NAME}@{MODEL_ALIAS}"
+   model_uri = "runs:/1d8d9563883e426ba6b51978e944b82b/model"
 
    if _model is None or _model_uri_loaded != model_uri:
        print(f"Chargement du modèle MLflow : {model_uri}")

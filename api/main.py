@@ -84,7 +84,7 @@ def predict(data: PredictionInput):
         "apd_regression_model",
         "champion"
     )
-
+   
     engine = create_engine(DATABASE_URL)
 
     with engine.begin() as conn:
@@ -95,17 +95,17 @@ def predict(data: PredictionInput):
             VALUES
             (:input_data, :prediction, :model_name, :model_version)
         """),
-            {
-                "input_data": json.dumps(input_data),
-                "prediction": float(prediction),
-                "model_name": "Random Forest Regressor",
-                "model_version": str(champion.version),
-            },
-        )
+        {
+            "input_data": json.dumps(input_data),
+            "prediction": float(prediction),
+            "model_name": "Random Forest Regressor",
+            "model_version": str(champion.version),
+        },
+    )
 
-    return {
-        "prediction_engagement_k_eur": round(prediction, 2)
-    }
+        return {
+            "prediction_engagement_k_eur": round(prediction, 2)
+        }
 
 @app.post("/pipeline")
 def pipeline(x_api_key: str = Header(None)):
