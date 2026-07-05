@@ -261,17 +261,8 @@ Le projet utilise **GitHub Actions**.
 
 ---
 
-# 👥 Auteurs
-
-Projet réalisé par :
-
-- **Augustin FAYE**
-- **Mohamed AFIRI**
-
----
-
 # 📚 Technologies utilisées
-
+   
 - Python
 - Pandas
 - NumPy
@@ -283,3 +274,40 @@ Projet réalisé par :
 - Docker
 - Git
 - GitHub Actions
+   
+---
+
+# 👥 Auteurs
+
+Projet réalisé par :
+
+- **Augustin FAYE**
+- **Mohamed AFIRI**
+
+---
+
+# 📸 Aperçu de la plateforme
+
+## 🌐 API FastAPI
+
+L'API REST permet d'entraîner le modèle, d'effectuer des prédictions, de consulter les métriques et d'accéder à l'historique des prédictions via une documentation Swagger interactive.
+
+![API FastAPI](docs/images/api_fastapi.png)
+
+---
+
+## 💻 Interface Streamlit
+
+L'application Streamlit constitue l'interface utilisateur du projet. Elle permet d'envoyer des données à l'API FastAPI, d'obtenir une prédiction et d'afficher les informations du modèle Champion enregistré dans MLflow.
+
+![Application Streamlit](docs/images/streamlit_prediction.png)
+
+---
+
+## 📈 Suivi des expériences avec MLflow
+
+MLflow assure le suivi des expériences d'entraînement, l'enregistrement des métriques, des paramètres, des artefacts ainsi que le versionnement des modèles. Le modèle Champion est automatiquement utilisé par l'API pour les prédictions.
+
+![MLflow](docs/images/mlflow_run.png)
+
+---
