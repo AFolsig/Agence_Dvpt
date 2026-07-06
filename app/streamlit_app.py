@@ -19,7 +19,7 @@ page = st.sidebar.radio(
    "Navigation",
    [
        "Présentation",
-       "Accueil",
+       "Tableau de bord MLOps",
        "Architecture MLOps",
        "Données & Supabase",
        "Prédiction",
@@ -28,7 +28,7 @@ page = st.sidebar.radio(
    ],
 )
 
-if page == "Accueil":
+if page == "Tableau de bord MLOps":
 
    st.title("🏠 Tableau de bord MLOps")
    st.header("Projet APD - Aide Publique au Développement")
@@ -220,44 +220,6 @@ jusqu'à la prédiction finale.
    m6.metric("API", "FastAPI")
 
    st.caption("Ces indicateurs donnent une vue rapide du projet MLOps.")
-   st.divider()
-
-   
-   st.header("🔄 Cycle de vie complet des données")
-   
-   st.markdown("""
-   1. Collecte automatique des données APD
-   
-   2. Chargement dans Supabase
-   
-   3. Prétraitement
-   
-   4. Construction du pipeline
-   
-   5. Entraînement Random Forest
-       
-   6. Tracking MLflow
-   
-   7. Promotion du modèle Champion
-   
-   8. API FastAPI
-   
-   9. Prédiction
-   
-   10. Affichage dans Streamlit
-   """)
-   
-   col1, col2, col3 = st.columns(3)
-   
-   with col1:
-       st.metric("Pipeline", "100 %", "Automatisé")
-   
-   with col2:
-       st.metric("Modèle", "Random Forest")
-   
-   with col3:
-       st.metric("Registry", "Champion")
-
    st.divider()
 
    st.subheader("🧩 Schéma d'architecture MLOps")
