@@ -24,6 +24,7 @@ page = st.sidebar.radio(
        "Données & Supabase",
        "Prédiction",
        "Historique des prédictions",
+       "Monitoring & Drift",
        "Améliorations futures",
    ],
 )
@@ -1053,6 +1054,82 @@ elif page == "Présentation":
    - 🗄️ une base **PostgreSQL (Supabase)** ;
    - 📊 **MLflow** pour le suivi des expérimentations.
    """)
+
+elif page == "Monitoring & Drift":
+
+   st.title("📊 Monitoring & détection du drift")
+
+   st.markdown("""
+   Cette page présente le suivi de la dérive des données du projet APD.
+
+   Le jeu de données de référence est comparé aux données courantes afin de détecter
+   un changement de distribution susceptible de dégrader les performances du modèle.
+   """)
+
+   st.divider()
+
+   st.subheader("🔍 État du monitoring")
+
+   col1, col2, col3 = st.columns(3)
+
+   with col1:
+       st.metric(
+           label="Données de référence",
+           value="72 835 lignes"
+       )
+
+   with col2:
+       st.metric(
+           label="Données courantes",
+           value="72 835 lignes"
+       )
+
+   with col3:
+       st.metric(
+           label="Outil",
+           value="Evidently"
+       )
+
+   st.divider()
+
+   st.subheader("📄 Rapport Evidently")
+
+   report_path = "reports/data_drift_report.html"
+
+   try:
+       with open(report_path, "r", encoding="utf-8") as report_file:
+           report_html = report_file.read()
+
+       components.html(
+           report_html,
+           height=900,
+           scrolling=True
+       )
+
+       st.success("✅ Rapport de drift chargé avec succès.")
+
+   except FileNotFoundError:
+       st.error(
+           "Le rapport Evidently est introuvable. "
+           "Exécutez d’abord : python monitoring/drift_report.py"
+       )
+
+   st.divider()
+
+   st.subheader("♻️ Remédiation automatique")
+
+   st.markdown("""
+   Lorsque le drift dépasse le seuil défini :
+
+   - le drift est détecté ;
+   - un nouvel entraînement est déclenché ;
+   - les métriques du nouveau modèle sont enregistrées dans MLflow ;
+   - le meilleur modèle peut devenir le nouvel alias **Champion**.
+   """)
+
+   st.info(
+       "Script utilisé : monitoring/check_drift_and_retrain.py"
+   )
 
 elif page == "Améliorations futures":
 

@@ -1,0 +1,28 @@
+[
+  {
+    "timestamp": "2026-07-12T12:20:43",
+    "report": "/Users/augustinfaye/Documents/Agence_Dvpt/reports/data_drift_report.json",
+    "drift_information": {
+      "dataset_drift_evidently": false,
+      "drift_share": 0.5,
+      "drifted_columns": 0,
+      "threshold": 0.05,
+      "drift_detected": true
+    },
+    "action": "Réentraînement simulé",
+    "status": "Drift détecté"
+  },
+  {
+    "timestamp": "2026-07-12T12:51:21",
+    "report": "/Users/augustinfaye/Documents/Agence_Dvpt/reports/data_drift_report.json",
+    "drift_information": {
+      "dataset_drift_evidently": false,
+      "drift_share": 0.05714285714285714,
+      "drifted_columns": 2,
+      "threshold": 0.05,
+      "drift_detected": true
+    },
+    "action": "Réentraînement simulé",
+    "status": "Drift détecté"
+  }
+]

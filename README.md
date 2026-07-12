@@ -249,10 +249,34 @@ Le projet utilise **GitHub Actions**.
 
 ---
 
+## Monitoring & Remédiation automatique
+
+Le projet intègre un système de monitoring basé sur Evidently AI permettant de détecter les dérives des données.
+
+### Fonctionnalités
+
+- Génération automatique d'un rapport HTML et JSON avec Evidently.
+- Intégration du rapport dans l'interface Streamlit.
+- Détection des colonnes présentant une dérive statistique.
+- Seuil de remédiation personnalisé fixé à 5 % de colonnes en dérive.
+- Script `monitoring/check_drift_and_retrain.py` analysant automatiquement le rapport.
+- Mode simulation (par défaut) afin d'éviter tout réentraînement involontaire.
+- Réentraînement automatique disponible avec :
+
+```bash
+python monitoring/check_drift_and_retrain.py --execute
+```
+
+### Résultat obtenu
+
+- 35 colonnes analysées.
+- 2 colonnes détectées en dérive.
+- Part des colonnes en dérive : **5.71 %**.
+- Le seuil personnalisé de **5 %** déclenche une demande de remédiation.
+- Un historique des actions est enregistré dans les journaux de monitoring.
+
 # 🔮 Perspectives d'amélioration
 
-- Monitoring des performances du modèle
-- Détection de dérive des données
 - Réentraînement automatique avec Airflow
 - Déploiement cloud complet
 - Kubernetes
