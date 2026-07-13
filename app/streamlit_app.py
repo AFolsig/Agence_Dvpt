@@ -1159,19 +1159,27 @@ elif page == "Améliorations futures":
 
    st.divider()
 
-   st.header("📊 Monitoring avec Prometheus et Grafana")
+   st.markdown("## 📈 Évolutions du monitoring")
 
-   st.markdown("""
-   **Prometheus** et **Grafana** permettraient de suivre l'API et le modèle en production :
+   st.write("""
+   Le système de monitoring basé sur Evidently détecte automatiquement les dérives des données. 
+   Lorsqu'un seuil de dérive est dépassé, un réentraînement du modèle peut être déclenché 
+   afin de restaurer ses performances.
 
-   - temps de réponse de l'API ;
-   - nombre de prédictions réalisées ;
-   - erreurs HTTP ;
-   - évolution des performances du modèle ;
-   - dérive potentielle des données.
+   Les prochaines évolutions pourraient inclure :
    """)
 
-   st.success("Objectif : surveiller la santé du système et détecter rapidement les anomalies.")
+   st.markdown("""
+   - Alertes automatiques (email, Slack ou Teams) en cas de dérive importante.
+   - Tableau de bord temps réel pour suivre l'évolution des métriques du modèle.
+   - Déclenchement automatique du réentraînement via Airflow après détection d'un drift.
+   - Suivi continu des performances du modèle en production.
+   - Historisation avancée des rapports de monitoring et des actions de remédiation.
+   """)
+
+   st.success(
+       "Objectif : rendre le monitoring entièrement automatisé et proactif tout au long du cycle de vie du modèle."
+   )
 
    st.divider()
 
@@ -1206,10 +1214,10 @@ elif page == "Améliorations futures":
 
    st.divider()
 
-   st.header("🎯 Conclusion")
+   st.markdown("## 🎯 Conclusion")
 
    st.info("""
-   Le projet met déjà en oeuvre les principales briques d'un pipeline MLOps moderne :
+   Le projet met désormais en œuvre les principales briques d'un pipeline MLOps moderne :
 
    - collecte automatisée des données ;
    - stockage dans Supabase PostgreSQL ;
@@ -1218,7 +1226,12 @@ elif page == "Améliorations futures":
    - Model Registry avec alias Champion ;
    - API FastAPI sécurisée ;
    - interface Streamlit ;
-   - intégration continue (CI) avec GitHub Actions.
+   - intégration continue (CI) avec GitHub Actions ;
+   - monitoring des données avec Evidently ;
+   - détection automatique du drift ;
+   - génération de rapports HTML et JSON ;
+   - mécanisme de remédiation avec possibilité de déclencher le réentraînement du modèle ;
+   - journalisation des actions de monitoring et de remédiation.
 
-   Les améliorations proposées (Airflow, Prometheus, Grafana, Kubernetes et déploiement continu) constituent les prochaines étapes pour faire évoluer ce prototype vers une plateforme MLOps pleinement industrialisée.
+   Les évolutions proposées (Airflow, alertes automatiques, Kubernetes, déploiement cloud et automatisation complète du réentraînement) permettront de faire évoluer ce prototype vers une plateforme MLOps encore plus robuste et industrialisée.
    """)
