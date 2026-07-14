@@ -18,8 +18,17 @@ from datetime import datetime
 
 DATA_PATH = "data/processed/apd_ml_ready.csv"
 MODEL_PATH = "models/modele_regression_rf.pkl"
+load_dotenv()
+
+MLFLOW_TRACKING_URI = os.getenv(
+    "MLFLOW_TRACKING_URI",
+    "http://127.0.0.1:5001"
+)
+
+mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 
 def train_model():
+   print(">>> train_model() est exécutée <<<")
    load_dotenv()
    DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -169,5 +178,9 @@ def train_model():
 
        return metrics
 
-       if __name__ == "__main__":
-           print(train_model())
+       
+if __name__ == "__main__":
+    metrics = train_model()
+    print("Entraînement terminé.")
+    print(f"Métriques : {metrics}")
+       
