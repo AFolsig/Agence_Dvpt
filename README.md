@@ -2,20 +2,39 @@
 
 ## 📖 Présentation
 
-Ce projet a été réalisé dans le cadre d'une étude MLOps visant à prédire les **engagements de l'Aide Publique au Développement (APD)** à partir de données ouvertes.
+Projet Data Science & MLOps end-to-end consacré à l'analyse et à la prédiction des **engagements de l'Aide Publique au Développement (APD)** à partir de données ouvertes comprenant plus de **100 000 observations**.
 
-L'objectif est de mettre en place une chaîne MLOps complète allant de l'entraînement du modèle jusqu'à son déploiement en production.
+L'objectif est de construire une chaîne complète allant de la préparation des données jusqu'au déploiement et au monitoring d'un modèle de Machine Learning.
 
-Le projet intègre :
+### 🎯 Objectifs
 
-- 📊 Prétraitement des données
-- 🤖 Machine Learning (Random Forest Regressor)
-- 📈 MLflow Tracking & Model Registry
-- 🗄️ Supabase PostgreSQL pour le backend MLflow
-- 🚀 API REST FastAPI
-- 🌐 Interface utilisateur Streamlit
-- 🐳 Docker
-- ⚙️ GitHub Actions (CI/CD)
+- Analyser, nettoyer et préparer les données APD
+- Prédire les **Engagements (K EUR)**
+- Suivre les expérimentations et versionner les modèles avec MLflow
+- Exposer le modèle via une API REST FastAPI
+- Proposer une interface utilisateur avec Streamlit
+- Automatiser les pipelines et l'intégration continue
+- Détecter le data drift et permettre le réentraînement du modèle
+- Conteneuriser et expérimenter le déploiement de la solution
+
+### 🧰 Stack technique
+
+**Data Science :** Python, Pandas, NumPy, Scikit-learn, SHAP  
+**API & Application :** FastAPI, Streamlit  
+**MLOps :** MLflow, DVC, Evidently AI, Airflow  
+**Infrastructure :** Docker, Kubernetes, PostgreSQL, Supabase  
+**CI/CD & Versioning :** Git, GitHub Actions
+
+### 📈 Résultat principal
+
+Le **Random Forest Regressor** sélectionné comme modèle Champion atteint :
+
+| Métrique | Résultat |
+|---|---:|
+| R² | **0.724** |
+| MAE | **1 484 K EUR** |
+
+Le modèle Champion est versionné dans **MLflow Model Registry** et utilisé automatiquement par l'API de prédiction.
 
 ---
 
