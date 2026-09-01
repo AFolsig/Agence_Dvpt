@@ -296,11 +296,12 @@ mlflow ui \
 
 Le projet utilise **GitHub Actions**.
 
-À chaque `git push` sur la branche **main**, le workflow CI :
+À chaque `git push` sur la branche **main** et lors des pull requests vers **main**, le workflow CI :
 
-- installe les dépendances
-- vérifie le projet
-- valide le pipeline CI/CD
+- configure l'environnement Python 3.11
+- installe les dépendances du projet
+- vérifie la syntaxe des principaux fichiers Python
+- construit l'image Docker de l'API
 
 ---
 
