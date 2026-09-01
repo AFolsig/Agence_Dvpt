@@ -21,8 +21,8 @@ L'objectif est de construire une chaîne complète allant de la préparation des
 
 **Data Science :** Python, Pandas, NumPy, Scikit-learn, SHAP  
 **API & Application :** FastAPI, Streamlit  
-**MLOps :** MLflow, DVC, Evidently AI, Airflow  
-**Infrastructure :** Docker, Kubernetes, PostgreSQL, Supabase  
+**MLOps :** MLflow, DVC, Evidently AI  
+**Infrastructure :** Docker, PostgreSQL, Supabase  
 **CI/CD & Versioning :** Git, GitHub Actions
 
 ### 📈 Résultat principal
@@ -40,23 +40,52 @@ Le modèle Champion est versionné dans **MLflow Model Registry** et utilisé au
 
 # 🏗️ Architecture MLOps
 
-```
-                  Utilisateur
-                       │
-                       ▼
-                🌐 Streamlit
-                       │
-                       ▼
-                 🚀 FastAPI API
-                       │
-                       ▼
-        MLflow Model Registry (Champion)
-                       │
-                       ▼
-             Random Forest Regressor
-                       │
-                       ▼
-         Supabase PostgreSQL (Tracking)
+```text
+                        ┌─────────────────────┐
+                        │   Données APD       │
+                        │   Open Data         │
+                        └──────────┬──────────┘
+                                   │
+                                   ▼
+                        ┌─────────────────────┐
+                        │ Collecte / ETL      │
+                        │ Prétraitement       │
+                        └──────────┬──────────┘
+                                   │
+                                   ▼
+                        ┌─────────────────────┐
+                        │ Dataset préparé     │
+                        │ Versioning DVC      │
+                        └──────────┬──────────┘
+                                   │
+                                   ▼
+                        ┌─────────────────────┐
+                        │ Machine Learning    │
+                        │ Random Forest       │
+                        └──────────┬──────────┘
+                                   │
+                                   ▼
+            ┌──────────────────────────────────────┐
+            │ MLflow Tracking & Model Registry     │
+            │ Runs • Métriques • Versions          │
+            │ Modèle Champion                      │
+            └───────────────┬──────────────────────┘
+                            │
+                            ▼
+                   ┌─────────────────┐
+                   │ FastAPI REST API│
+                   └────────┬────────┘
+                            │
+                            ▼
+                   ┌─────────────────┐
+                   │ Streamlit UI    │
+                   │ Prédictions     │
+                   └─────────────────┘
+
+      Monitoring : Evidently AI → Détection du drift → Déclenchement du réentraînement 
+      CI/CD : GitHub Actions
+      Infrastructure : Docker 
+      Tracking Backend : Supabase PostgreSQL
 ```
 
 ---
@@ -65,23 +94,25 @@ Le modèle Champion est versionné dans **MLflow Model Registry** et utilisé au
 
 ```
 Agence_Dvpt/
-
-├── api/
-├── app/
-├── data/
-├── docs/
-├── etl/
-├── ingestion/
-├── models/
-├── notebooks/
-├── preprocessing/
-├── scripts/
-├── tests/
+│
+├── api/              # API REST FastAPI
+├── app/              # Interface utilisateur Streamlit
+├── data/             # Données brutes et préparées
+├── docs/             # Documentation du projet
+├── etl/              # Pipeline ETL et préparation des données
+├── ingestion/        # Collecte et ingestion des données
+├── models/           # Entraînement et gestion des modèles ML
+├── monitoring/       # Détection du data drift avec Evidently
+├── notebooks/        # Notebooks d'analyse et d'expérimentation
+├── preprocessing/    # Nettoyage et prétraitement
+├── reports/          # Rapports et résultats générés
+├── scripts/          # Scripts utilitaires
+├── tests/            # Tests automatisés
 ├── .github/
-│   └── workflows/
-├── Dockerfile
-├── requirements.txt
-└── README.md
+│   └── workflows/    # Pipelines CI/CD GitHub Actions
+├── Dockerfile        # Construction de l'image Docker
+├── requirements.txt  # Dépendances Python
+└── README.md         # Documentation principale
 ```
 
 ---
@@ -136,6 +167,11 @@ Le backend MLflow est connecté à une base PostgreSQL hébergée sur Supabase a
 
 L'API permet :
 
+- de vérifier l'état du service avec `/health`
+- d'effectuer une prédiction avec `/predict`
+- de déclencher un nouvel entraînement avec `/train`
+- de charger automatiquement le modèle Champion depuis MLflow Model Registry
+  
 ### Vérification
 
 ```
@@ -313,6 +349,8 @@ python monitoring/check_drift_and_retrain.py --execute
 - FastAPI
 - Streamlit
 - MLflow
+- DVC
+- Evidently AI
 - Supabase PostgreSQL
 - Docker
 - Git
