@@ -1,4 +1,5 @@
 import pandas as pd
+from models.model_promotion import should_promote
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 import mlflow
@@ -155,7 +156,7 @@ def train_model():
        except Exception:
            pass
 
-       if True:
+       if should_promote(mae, best_mae):
            client.set_registered_model_alias(
                name=model_name,
                alias="champion",
