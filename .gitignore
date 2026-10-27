@@ -20,3 +20,5 @@ mlruns/
 logs/
 
 apd.db
+# Journaux générés par le monitoring
+reports/drift_remediation_log.json
