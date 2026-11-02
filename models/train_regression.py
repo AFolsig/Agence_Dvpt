@@ -153,8 +153,14 @@ def train_model():
            champion = client.get_model_version_by_alias(model_name, "champion")
            champion_run = client.get_run(champion.run_id)
            best_mae = champion_run.data.metrics.get("mae")
-       except Exception:
-           pass
+       except Exception as e:
+           raise RuntimeError(
+               "Impossible de récupérer la MAE du champion MLflow"
+           ) from e
+       print("DEBUG - MAE candidat :", repr(mae))
+       print("DEBUG - MAE champion :", repr(best_mae))
+       print("DEBUG - Champion version :", champion.version)
+       print("DEBUG - Promotion autorisée :", should_promote(mae, best_mae))
 
        if should_promote(mae, best_mae):
            client.set_registered_model_alias(

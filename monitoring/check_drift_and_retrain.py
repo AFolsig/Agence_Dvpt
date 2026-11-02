@@ -1,4 +1,5 @@
 import argparse
+import hashlib
 import json
 import subprocess
 import sys
@@ -16,6 +17,10 @@ LOG_PATH = PROJECT_ROOT / "reports" / "drift_remediation_log.json"
 # Le rapport affiche environ 5,71 % de colonnes en drift.
 # Un seuil de 5 % permet donc de déclencher la remédiation.
 DRIFT_THRESHOLD = 0.05
+
+def get_report_hash() -> str:
+    """Calcule une empreinte SHA-256 du rapport Evidently."""
+    return hashlib.sha256(REPORT_PATH.read_bytes()).hexdigest()
 
 
 def search_values(data: Any, searched_keys: set[str]) -> list[Any]:
@@ -106,6 +111,7 @@ def save_remediation_log(
     log_entry = {
         "timestamp": datetime.now().isoformat(timespec="seconds"),
         "report": str(REPORT_PATH),
+        "report_hash": get_report_hash(),
         "drift_information": drift_information,
         "action": action,
         "status": status,
@@ -129,7 +135,27 @@ def save_remediation_log(
 
     with LOG_PATH.open("w", encoding="utf-8") as file:
         json.dump(history, file, ensure_ascii=False, indent=2)
+def report_already_processed() -> bool:
+    """Vérifie si ce rapport a déjà déclenché un entraînement réussi."""
 
+    if not LOG_PATH.exists():
+        return False
+
+    with LOG_PATH.open("r", encoding="utf-8") as file:
+        history = json.load(file)
+
+    if not isinstance(history, list):
+        raise ValueError("Historique des remédiations invalide.")
+
+    current_hash = get_report_hash()
+
+    return any(
+        entry.get("report_hash") == current_hash
+        and entry.get("action") == "Réentraînement exécuté"
+        and entry.get("status") == "Succès"
+        for entry in history
+        if isinstance(entry, dict)
+    )
 
 def launch_retraining() -> None:
     """Lance le script existant d’entraînement du modèle."""
@@ -142,7 +168,7 @@ def launch_retraining() -> None:
     print("\n🔄 Lancement du réentraînement du modèle...")
 
     subprocess.run(
-        [sys.executable, str(TRAIN_SCRIPT)],
+        [sys.executable, "-m", "models.train_regression"],
         cwd=PROJECT_ROOT,
         check=True,
     )
@@ -199,6 +225,11 @@ def main() -> None:
             action="Réentraînement simulé",
             status="Drift détecté",
         )
+        return
+
+    if report_already_processed():
+        print("\n✅ Ce rapport Evidently a déjà été traité avec succès.")
+        print("⏭️ Réentraînement ignoré : aucun nouveau modèle créé.")
         return
 
     try:

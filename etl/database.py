@@ -47,14 +47,26 @@ def mark_batch_loaded(batch_name):
 
 def load_batch(df, batch_name):
 
-    df.to_sql(
-        "apd_data",
-        engine,
-        if_exists="append",
-        index=False
-    )
-   
-    mark_batch_loaded(batch_name)
+    with engine.begin() as conn:
 
-    print("Batch chargé")
+        result = conn.execute(
+            text("""
+                INSERT OR IGNORE INTO processed_batches(batch_name)
+                VALUES (:name)
+            """),
+            {"name": batch_name}
+        )
+
+        if result.rowcount == 0:
+            print(f"Lot déjà chargé : {batch_name}")
+            return
+
+        df.to_sql(
+            "apd_data",
+            conn,
+            if_exists="append",
+            index=False
+        )
+
+    print(f"Lot chargé avec succès : {batch_name}")
 

@@ -22,3 +22,11 @@ logs/
 apd.db
 # Journaux générés par le monitoring
 reports/drift_remediation_log.json
+backups/
+
+# Bases de données locales
+*.db
+
+# Rapports Evidently générés automatiquement
+reports/data_drift_report.html
+reports/data_drift_report.json
